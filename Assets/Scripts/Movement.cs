@@ -4,7 +4,9 @@ using UnityEngine.InputSystem;
 public class Movement : MonoBehaviour
 {
     [SerializeField] InputAction thrust;
+    [SerializeField] InputAction rotation;
     [SerializeField] float thrustStrength = 100f;
+    [SerializeField] float rotationStrength = 100f;
 
     Rigidbody rb;
 
@@ -16,9 +18,16 @@ public class Movement : MonoBehaviour
     private void OnEnable()
     {
         thrust.Enable();
+        rotation.Enable();
     }
 
     private void FixedUpdate()
+    {
+        ProcessThrust();
+        ProcessRotation();
+    }
+
+    private void ProcessThrust()
     {
         if (thrust.IsPressed())
         {
@@ -26,4 +35,24 @@ public class Movement : MonoBehaviour
         }
     }
 
+    private void ProcessRotation()
+    {
+        if (rotation.IsPressed())
+        {
+            float rotationInput = rotation.ReadValue<float>();
+            if (rotationInput < 0)
+            {
+                ApplyRotation(rotationStrength);
+            }
+            else if (rotationInput > 0)
+            {
+                ApplyRotation(-rotationStrength);
+            }
+        }
+    }
+
+    private void ApplyRotation(float rotationThisFrame)
+    {
+        transform.Rotate(Vector3.forward * rotationThisFrame * Time.fixedDeltaTime);
+    }
 }
